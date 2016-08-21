@@ -1,3 +1,4 @@
+'''Used to install when cloned.'''
 from setuptools import setup
 
 setup(name='pyparadox-alarm',
@@ -8,5 +9,5 @@ setup(name='pyparadox-alarm',
       url='https://github.com/PollieKrismis/pyparadox-alarm.git',
       packages=['paradox'],
       install_requires=['pyserial'],
-      scripts=['Dummy']
+      scripts=['test']
   )
