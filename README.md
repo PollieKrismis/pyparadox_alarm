@@ -1,4 +1,4 @@
-# paradox-alarm
+# pyparadox
 Some code to interface with a Paradox Alarm Panel.
 
 The code is needed to allow Paradox Alarms to be used in Home Assistant.
