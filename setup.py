@@ -8,5 +8,5 @@ setup(name='pyparadox-alarm',
       url='https://github.com/PollieKrismis/pyparadox-alarm.git',
       packages=['paradox'],
       install_requires=['pyserial'],
-      scripts=[],
+      scripts=['Dummy'],
   )
