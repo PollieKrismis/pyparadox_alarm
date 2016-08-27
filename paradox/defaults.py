@@ -1,3 +1,10 @@
+"""Default values specific to a Paradox Alarm Panel."""
+
+#Message prefixes
+AREA_LABEL_REQUEST = "AL"
+AREA_STATUS_REQUEST = "AR"
+ZONE_LABEL_REQUEST = "ZL"
+ZONE_STATUS_REQUEST = "RZ"
 
 PARADOX_MODELS = {
     'EVO48' :
