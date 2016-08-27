@@ -1,9 +1,11 @@
+#Derived from https://github.com/Cinntax/pyenvisalink/blob/master/pyenvisalink/alarm_state.py
+
 class AlarmState:
-    """Helper class for alarm state functionality."""
+    '''Helper class for alarm state functionality.'''
 
     @staticmethod
     def get_initial_alarm_state(max_zones, max_partitions):
-        """Builds the proper alarm state collection."""
+        '''Builds the proper alarm state collection.'''
 
         _alarm_state = {'partition': {}, 'zone': {}}
 

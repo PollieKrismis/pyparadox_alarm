@@ -12,17 +12,13 @@ class ParadoxAlarmPanel:
         
     def __init__(self, paradox_model='EVO48', comm_module='PRT3',
                  code, username='user', password='user',
-                 prt_port='/dev/ttyUSB0', prt_speed=57600,
-                 ip_host, ip_port, zone_timer_interval=20, keep_alive_interval=30):
+                 prt_port='/dev/ttyUSB0', prt_speed=57600):
         self._paradox_model = paradox_model
         self._username = username
         self._password = password
         self._prt_port = prt_port
         self._prt_speed = prt_speed
-        self._ip_host = ip_host
-        self._ipPort = ip_port
-        self._keepAliveInterval = keep_alive_interval
-        self._zoneTimerInterval = zone_timer_interval
+
         #Setup default panel state
         self._panel = None
         self._maxPartitions = PARADOX_MODELS[self._paradox_model]['MaxAreas']
