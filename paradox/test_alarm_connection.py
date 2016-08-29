@@ -1,8 +1,8 @@
 import logging
-import json
-import re
 import time
-from pyparadox-alarm.alarm_panel import ParadoxAlarmPanel
+from alarm_panel import ParadoxAlarmPanel
+#from paradox import *
+#import paradox
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,13 +12,14 @@ loggingconfig = {'level': 'DEBUG',
 
 logging.basicConfig(**loggingconfig)
 
-
+_LOGGER.warn('Start')
 panel = ParadoxAlarmPanel()
 
 _LOGGER.info('Start test:')
 _LOGGER.info('Alarm State before:')
-print(alarmState['zone'])
+#print(panel.alarm_state['zone'])
+print(panel.alarm_state())
 panel.start()
 sleep(20)
 _LOGGER.info('Alarm State after:')
-print(alarmState['zone'])
+print(panel.alarm_state())

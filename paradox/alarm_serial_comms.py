@@ -85,7 +85,7 @@ class ParadoxSerialComms:
             request = self.request_queue.get() + "\r"
             _LOGGER.debug(str.format('TX > {0}', request.encode('ascii')))
             with self._lock:
-                self._pipe.write(request.encode('utf-8'))
+                self._pipe.write(request.encode('ascii'))
                 time.sleep(2)
             self.request_queue.task_done() # Notifies join() that each put() had a get()
         _LOGGER.debug(str.format('Stop submitting requests...'))
