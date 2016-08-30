@@ -184,14 +184,14 @@ class ParadoxAlarmPanel:
             #if items > 0:
             try:
                 response = self._from_alarm.get_nowait()
+                self.decode_response(response)
+                print("Response found:{}".format(response))
+                self._from_alarm.task_done()
+                time.sleep(2)
+                i += 1
             except Empty:
                 time.sleep(5)
 
-            self.decode_response(response)
-            print("Response found:{}".format(response))
-            self._from_alarm.task_done()
-            time.sleep(2)
-            i += 1
 
         print("queue empty?")
 
