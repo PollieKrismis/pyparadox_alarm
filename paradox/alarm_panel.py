@@ -57,13 +57,13 @@ class ParadoxAlarmPanel:
         self._partitionStateChangeCallback = self._defaultCallback
         self._cidEventCallback = self._defaultCallback
         self._zoneTimerCallback = self._defaultCallback
+        '''
 
         loggingconfig = {'level': 'DEBUG',
             'format': '%(asctime)s %(levelname)s <%(name)s %(module)s %(funcName)s> %(message)s',
             'datefmt': '%a, %d %b %Y %H:%M:%S'}
 
         logging.basicConfig(**loggingconfig)
-        '''
 
     @ property
     def port(self):
@@ -119,14 +119,14 @@ class ParadoxAlarmPanel:
 
     def request_all_labels(self, area_total, zone_total):
         """Submits requests for all area and zone labels."""
-        _LOGGER.info(str.format("Requesting zone {0} labels...", zone_total))
+        _LOGGER.info(str.format("Requesting {0} zone labels...", zone_total))
         for i in range(1, zone_total + 1):
             self.submit_zone_label_request(i)
             time.sleep(0.1)
 
     def request_all_statuses(self, area_total, zone_total):
         """Submits requests for all area and zone statuses."""
-        _LOGGER.info(str.format("Requesting zone {0} statuses...", zone_total))
+        _LOGGER.info(str.format("Requesting {0} zone statuses...", zone_total))
 
         for i in range(1, zone_total + 1):
             self.submit_zone_status_request(i)
@@ -178,20 +178,20 @@ class ParadoxAlarmPanel:
     def monitor_response_queue(self):
         """Wait for responses from the Paradox Alarm and decode them."""
         print("checking response queue...")
-        i = 1
-        while i < 10:
+        i = 0
+        while i < self._max_zones:
             #items = from_alarm.qsize()
             #if items > 0:
             try:
                 response = self._from_alarm.get_nowait()
             except Empty:
-                time.sleep(5)
+                time.sleep(1)
                 i += 1
 
             self.decode_response(response)
             print("Response found:{}".format(response))
             self._from_alarm.task_done()
-            time.sleep(5)
+            time.sleep(1)
             i += 1
 
         print("queue empty?")
