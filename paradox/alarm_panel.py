@@ -111,10 +111,11 @@ class ParadoxAlarmPanel:
         self._panel.start()
         #Allow for a list of areas and zones to be passed rather than simply requesting all
         self.request_all_labels(self._maxPartitions, self._maxZones)
-        time.sleep(25) #Allow some time for the requests to be serviced
-        self.request_all_statuses(self._maxPartitions, self._maxZones)
-        time.sleep(1)
+        time.sleep(1) #Why do we need this?
         self.monitor_response_queue()
+        while not self._to_alarm.empty():
+            time.sleep(5) #Allow some time for all the requests to be serviced
+        self.request_all_statuses(self._maxPartitions, self._maxZones)
         
     def stop(self):
         """Shut down and close our connection to the Paradox Alarm."""
@@ -166,18 +167,31 @@ class ParadoxAlarmPanel:
 
     def decode_response(self, response):
         """Decode the Paradox Alarm response."""
+        _msg_type = response
         if response[:1] == "G":
             print("Event Group")
         elif response[:2] == "ZL":
             print("Zone Label")
+            self.set_zone_name(int(response[2:5]), response[5:])
+        elif _msg_type == "RZ":
+            print("Zone Status")
+            self.update_zone_status(response[1:4], response[5:8])
         else:
             print("To be defined")
+
+    def set_zone_name(self, number, name):
+        """Sets the name of the zone."""
+        self._alarm_state['zone'][number]['name'] = name
+
+    def update_zone_status(self, number, status):
+        """Updates the zone status."""
+        return True
     
     def monitor_response_queue(self):
         """Wait for responses from the Paradox Alarm and decode them."""
         print("checking response queue...")
         i = 1
-        while i < 5:
+        while i < 10:
             #items = from_alarm.qsize()
             #if items > 0:
             try:

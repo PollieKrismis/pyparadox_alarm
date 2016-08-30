@@ -19,10 +19,11 @@ class AlarmState:
                                                         'armed_stay': False, 'alpha': False,
                                                         'beep': False,
                                                         'exit_delay': False, 'entry_delay': False,},
-                                            'name': False}
+                                            'name': ''}
         for j in range(1, max_zones + 1):
             _alarm_state['zone'][j] = {'status': {'open': False, 'fault': False, 'alarm': False,
-                                                    'tamper': False}, 'last_fault': 0,
-                                       'name': False}
+                                                    'tamper': False},
+                                       'last_fault': 0,
+                                       'name': ''}
 
         return _alarm_state
