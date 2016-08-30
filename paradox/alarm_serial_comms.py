@@ -45,7 +45,7 @@ class ParadoxSerialComms:
         else:
             #Connection should now be open
             self._shutdown = False
-            logging.info(str.format("Connected to Paradox on port: {0}, speed: {1}",
+            _LOGGER.info(str.format("Connected to Paradox on port: {0}, speed: {1}",
                                     self._port, self._speed))
 
     def reconnect(self):
@@ -59,7 +59,7 @@ class ParadoxSerialComms:
                 else:
                     _LOGGER.error(str.format('Unable to re-open serial connection.'))
         else:
-            logging.info(str.format("Reconnect ignored, port {} already open.", self._port))
+            _LOGGER.info(str.format("Reconnect ignored, port {} already open.", self._port))
 
     def disconnect(self):
         '''Closes the serial connection to the Paradox Alarm Panel..'''
