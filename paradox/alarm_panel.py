@@ -1,7 +1,7 @@
 """Replicates a Paradox Alarm panel and allows interfacing to it."""
 import logging
 import time
-from queue import Queue
+from queue import Queue, Empty
 from alarm_defaults import PARADOX_MODELS
 from alarm_serial_comms import ParadoxSerialComms
 from alarm_state import AlarmState
@@ -184,9 +184,8 @@ class ParadoxAlarmPanel:
             #if items > 0:
             try:
                 response = self._from_alarm.get_nowait()
-            except self._from_alarm.empty():
-                time.sleep(2)
-                i += 1
+            except Empty:
+                time.sleep(5)
 
             self.decode_response(response)
             print("Response found:{}".format(response))
