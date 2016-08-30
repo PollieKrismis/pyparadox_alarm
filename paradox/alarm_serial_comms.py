@@ -123,7 +123,7 @@ class ParadoxSerialComms:
         time.sleep(5) #Wait for the the dummy request to be processed before closing the connection
         self.disconnect()
         #This won't work if some requests are pending;Do we need it?
-        self.request_queue.join() #Can't we just kill the thread?
+        #self.request_queue.join() #Can't we just kill the thread?
         _LOGGER.debug(str.format('Threads stopped...'))
 
     def is_open(self):
