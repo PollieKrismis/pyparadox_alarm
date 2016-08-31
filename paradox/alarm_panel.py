@@ -113,6 +113,7 @@ class ParadoxAlarmPanel:
 
     def stop(self):
         '''Shut down and close our connection to the Paradox Alarm.'''
+        self._shutdown = True # this should kill the "monitoring" thread
         if self._panel:
             _LOGGER.info("Disconnecting from the Paradox Alarm...")
             self._panel.stop()
@@ -176,7 +177,7 @@ class ParadoxAlarmPanel:
     def update_zone_status(self, number, status):
         '''Updates the zone status.'''
         #OPEN = 'O'
-        _status = False #status[:1]
+        _status = True #status[:1]
         #_in_alarm = status[1:2]
         #_fire = status[2:3]
         #_supervision_lost = status[3:4]
