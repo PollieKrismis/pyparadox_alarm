@@ -1,6 +1,7 @@
 """Replicates a Paradox Alarm panel and allows interfacing to it."""
 import logging
 import time
+import threading
 from queue import Queue, Empty
 from alarm_defaults import PARADOX_MODELS
 from alarm_serial_comms import ParadoxSerialComms
@@ -104,11 +105,10 @@ class ParadoxAlarmPanel:
         self._panel.start()
         #Allow for a list of areas and zones to be passed rather than simply requesting all
         self.request_all_labels(self._max_areas, self._max_zones)
+        listen_thread = threading.Thread(target=self.monitor_response_queue)
+        listen_thread.start() #We need a thread to keep on listening for alarm messages
         time.sleep(2) #With proper queue management this should not be needed.
-        self.monitor_response_queue() #Start processing the responses
-        #Again find a better way to deal with this..
-        #self._to_alarm.join() #Allow some time for all the requests to be serviced
-        time.sleep(30)
+        self._to_alarm.join() #Allow some time for all the requests to be serviced
         self.request_all_statuses(self._max_areas, self._max_zones)
 
     def stop(self):
