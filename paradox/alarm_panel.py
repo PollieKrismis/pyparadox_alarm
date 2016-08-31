@@ -3,7 +3,7 @@ import logging
 import time
 import threading
 from queue import Queue, Empty
-from alarm_defaults import PARADOX_MODELS
+from paradox_defaults import PARADOX_MODELS
 from alarm_serial_comms import ParadoxSerialComms
 from alarm_state import AlarmState
 
@@ -25,8 +25,8 @@ class ParadoxAlarmPanel:
 
         #Setup default panel state
         self._panel = None
-        self._max_areas = PARADOX_MODELS[self._paradox_model]['MaxAreas']
-        self._max_zones = PARADOX_MODELS[self._paradox_model]['MaxZones']
+        self._max_areas = PARADOX_MODELS[self._paradox_model]['max areas']
+        self._max_zones = PARADOX_MODELS[self._paradox_model]['max zones']
         self._alarm_state = AlarmState.get_initial_alarm_state(self._max_zones, self._max_areas)
         #Setup queues to be used to submit/receive data to/from the panel
         self._to_alarm = Queue()
@@ -176,13 +176,18 @@ class ParadoxAlarmPanel:
 
     def update_zone_status(self, number, status):
         '''Updates the zone status.'''
-        #OPEN = 'O'
-        _status = True #status[:1]
-        #_in_alarm = status[1:2]
+        ZONE_OPEN = 'O'
+        ZONE_ALARM = 'A'
+        _status = status[:1]
+        _in_alarm = status[1:2]
         #_fire = status[2:3]
         #_supervision_lost = status[3:4]
         #_low_battery = status[4:5]
-        self._alarm_state['zone'][number]['status']['open'] = _status
+        _zone_info = {'open': (ZONE_OPEN == _status),
+                        'fault': False,
+                        'alarm': (ZONE_ALARM == _in_alarm),
+                        'tamper': False}
+        self._alarm_state['zone'][number]['status'] = _zone_info
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
