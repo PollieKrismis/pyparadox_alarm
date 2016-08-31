@@ -104,9 +104,11 @@ class ParadoxAlarmPanel:
         self._panel.start()
         #Allow for a list of areas and zones to be passed rather than simply requesting all
         self.request_all_labels(self._max_areas, self._max_zones)
-        time.sleep(1) #Why do we need this?
+        time.sleep(2) #With proper queue management this should not be needed.
         self.monitor_response_queue() #Start processing the responses
-        self._to_alarm.join() #Allow some time for all the requests to be serviced
+        #Again find a better way to deal with this..
+        #self._to_alarm.join() #Allow some time for all the requests to be serviced
+        time.sleep(30)
         self.request_all_statuses(self._max_areas, self._max_zones)
 
     def stop(self):
