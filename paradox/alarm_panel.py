@@ -1,4 +1,4 @@
-"""Replicates a Paradox Alarm panel and allows interfacing to it."""
+'''Replicates a Paradox Alarm panel and allows interfacing to it.'''
 import logging
 import time
 import threading
@@ -12,7 +12,7 @@ COMMAND_ERR = "Cannot run this command while disconnected. Please run start() fi
 
 
 class ParadoxAlarmPanel:
-    """This class represents an Paradox alarm panel."""
+    '''This class represents an Paradox alarm panel.'''
 
     def __init__(self, paradox_model='EVO48', comm_module='PRT3',
                  username='user', password='user',
@@ -31,7 +31,7 @@ class ParadoxAlarmPanel:
         #Setup queues to be used to submit/receive data to/from the panel
         self._to_alarm = Queue()
         self._from_alarm = Queue()
-
+        self._shutdown = None
 
 
 
@@ -68,12 +68,12 @@ class ParadoxAlarmPanel:
 
     @ property
     def port(self):
-        """Returns the ip or usb port used to connect to the alarm panel."""
+        '''Returns the ip or usb port used to connect to the alarm panel.'''
         return self._prt_port
 
     @property
     def paradox_model(self):
-        """Returns the model of the alarm panel being connected to."""
+        '''Returns the model of the alarm panel being connected to.'''
         return self._paradox_model
 
     @property
@@ -93,11 +93,11 @@ class ParadoxAlarmPanel:
         self._partitionStateChangeCallback = value
 
     def _defaultCallback(self, data):
-        """This is the callback that occurs when the client doesn't subscribe."""
+        '''This is the callback that occurs when the client doesn't subscribe.'''
         _LOGGER.debug("Callback has not been set by client.")
 
     def start(self):
-        """Connect to the Paradox Alarm and start listening for events to occur."""
+        '''Connect to the Paradox Alarm and start listening for events to occur.'''
         _LOGGER.info(str.format("Connecting to Paradox on host: {0}, port: {1}",
                                 self._prt_port, self._prt_speed))
         self._panel = ParadoxSerialComms(self._to_alarm, self._from_alarm,
@@ -112,7 +112,7 @@ class ParadoxAlarmPanel:
         self.request_all_statuses(self._max_areas, self._max_zones)
 
     def stop(self):
-        """Shut down and close our connection to the Paradox Alarm."""
+        '''Shut down and close our connection to the Paradox Alarm.'''
         if self._panel:
             _LOGGER.info("Disconnecting from the Paradox Alarm...")
             self._panel.stop()
@@ -120,14 +120,14 @@ class ParadoxAlarmPanel:
             _LOGGER.error(COMMAND_ERR)
 
     def request_all_labels(self, area_total, zone_total):
-        """Submits requests for all area and zone labels."""
+        '''Submits requests for all area and zone labels.'''
         _LOGGER.info(str.format("Requesting {0} zone labels...", zone_total))
         for i in range(1, zone_total + 1):
             self.submit_zone_label_request(i)
             time.sleep(0.1)
 
     def request_all_statuses(self, area_total, zone_total):
-        """Submits requests for all area and zone statuses."""
+        '''Submits requests for all area and zone statuses.'''
         _LOGGER.info(str.format("Requesting {0} zone statuses...", zone_total))
 
         for i in range(1, zone_total + 1):
@@ -135,68 +135,70 @@ class ParadoxAlarmPanel:
             time.sleep(0.1)
 
     def submit_area_label_request(self, area_num):
-        """Places an area label request on the request queue."""
+        '''Places an area label request on the request queue.'''
         self.submit_request("AL" + str(area_num).zfill(3))
 
     def submit_zone_label_request(self, zone_num):
-        """Places a zone label request on the request queue."""
+        '''Places a zone label request on the request queue.'''
         self.submit_request("ZL" + str(zone_num).zfill(3))
 
     def submit_area_status_request(self, area_num):
-        """Places an area label request on the request queue."""
+        '''Places an area label request on the request queue.'''
         self.submit_request("RA" + str(area_num).zfill(3))
 
     def submit_zone_status_request(self, zone_num):
-        """Places a zone label request on the request queue."""
+        '''Places a zone label request on the request queue.'''
         self.submit_request("RZ" + str(zone_num).zfill(3))
 
     def submit_request(self, request):
-        """Places a request on the request queue."""
+        '''Places a request on the request queue.'''
         self._to_alarm.put(request, timeout=10)
 
     def decode_response(self, response):
-        """Decode the Paradox Alarm response."""
-        _msg_type = response
+        '''Decode the Paradox Alarm response.'''
+        _msg_type = response[:2]
         if response[:1] == "G":
+            #System event
             print("Event Group")
         elif response[:2] == "ZL":
             print("Zone Label")
             self.set_zone_name(int(response[2:5]), response[5:])
         elif _msg_type == "RZ":
             print("Zone Status")
-            self.update_zone_status(response[1:4], response[5:])
+            self.update_zone_status(int(response[2:5]), response[5:])
         else:
             print("To be defined")
 
     def set_zone_name(self, number, name):
-        """Sets the name of the zone."""
+        '''Sets the name of the zone.'''
         self._alarm_state['zone'][number]['name'] = name
 
     def update_zone_status(self, number, status):
-        """Updates the zone status."""
-        self._alarm_state['zone'][number]['status'] = status #this must be an update statement!!
-        return True
+        '''Updates the zone status.'''
+        #OPEN = 'O'
+        _status = False #status[:1]
+        #_in_alarm = status[1:2]
+        #_fire = status[2:3]
+        #_supervision_lost = status[3:4]
+        #_low_battery = status[4:5]
+        self._alarm_state['zone'][number]['status']['open'] = _status
 
     def monitor_response_queue(self):
-        """Wait for responses from the Paradox Alarm and decode them."""
-        print("checking response queue...")
-        i = 0
-        while i < (self._max_zones * 3):
-            #items = from_alarm.qsize()
-            #if items > 0:
+        '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
+        _LOGGER.debug(str.format('Wait for alarm responses/events on the queue...'))
+        self._shutdown = False  #Force endless loop
+        while not self._shutdown:
             try:
                 response = self._from_alarm.get_nowait()
                 self.decode_response(response)
-                print("Response found:{}".format(response))
+                _LOGGER.debug(str.format('Response found:{0}', response))
                 self._from_alarm.task_done()
-                time.sleep(2)
-                i += 1
+                time.sleep(0.1)
             except Empty:
                 time.sleep(5)
 
-
-        print("queue empty?")
+        _LOGGER.debug(str.format('Stop monitoring response/event queue...'))
 
     def alarm_state(self):
-        """Returns the alarm state dictionary."""
+        '''Returns the alarm state dictionary.'''
         return self._alarm_state

@@ -91,7 +91,7 @@ class ParadoxSerialComms:
         _LOGGER.debug(str.format('Stop submitting requests...'))
 
     def get_response(self):
-        '''Listen for messages from the panel and place them on the response queue.'''
+        '''Listen for messages from the panel and place them on the response queue (as thread).'''
         _LOGGER.debug(str.format('Listening for alarm panel messages/events...'))
         while not self._shutdown:
             try:

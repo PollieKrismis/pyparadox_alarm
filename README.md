@@ -1,8 +1,17 @@
 # pyparadox
 Some code to interface with a Paradox Alarm Panel.
 
-The code is needed to allow Paradox Alarms to be used in Home Assistant.
+The code was developed for the purpose of integrating Paradox Alarms into the Home Assistant home automation software.
 
-For now most things will be hard-coded in order to test integration with Home Assistant. As it starts to work hard-coding will be replaced with actual interfacing code.
+The current version is able to connect to the alarm panel request all area and zone labels as well as their statuses. 
 
-The main goal is to get the PRT-3 module to work as it does not require the panel to be exposed to the internet directly. Later on the code can be expanded to also support the IP100/150 modules. By definition this means only panels that support the PRT-3, IP100 and IP150 modules wll be supported, i.e. Evo and Magellan.
+It is also able to keep a dictionary in sync with the alarm panel my mirroring area and zone statuses.
+
+The next version must accept callback functions which will then be used to keep the Home Assistant devices in sync.
+
+The third version should be able to submit arming and maybe disarming commands to the panel.
+
+In it's current form it is only able to integrate with a Paradox Alarm panel that has the PRT3 module installed. 
+
+Later versions can be expanded to also support the IP100/150 modules. 
+
