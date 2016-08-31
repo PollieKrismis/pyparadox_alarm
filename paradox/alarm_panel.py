@@ -179,7 +179,7 @@ class ParadoxAlarmPanel:
         """Wait for responses from the Paradox Alarm and decode them."""
         print("checking response queue...")
         i = 0
-        while i < (self._max_zones * 2):
+        while i < (self._max_zones * 3):
             #items = from_alarm.qsize()
             #if items > 0:
             try:
