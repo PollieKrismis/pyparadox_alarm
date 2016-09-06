@@ -1,4 +1,5 @@
 '''Replicates a Paradox Alarm panel and allows interfacing to it.'''
+
 import logging
 import time
 import threading

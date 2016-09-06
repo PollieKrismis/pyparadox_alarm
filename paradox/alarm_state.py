@@ -1,3 +1,4 @@
+'''Class that defines a dictionary to be used to reflect alarm state.'''
 #Derived from https://github.com/Cinntax/pyenvisalink/blob/master/pyenvisalink/alarm_state.py
 
 class AlarmState:

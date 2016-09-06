@@ -1,4 +1,5 @@
 '''Some code to help test Paradox alarm interface.'''
+
 import logging
 import time
 from alarm_panel import ParadoxAlarmPanel
@@ -21,7 +22,7 @@ _LOGGER.info('Alarm State before:')
 #print(panel.alarm_state['zone'])
 print(panel.alarm_state())
 panel.start()
-time.sleep(60) #Wait because we're using threading
+time.sleep(80) #Wait because we're using threading
 _LOGGER.info('Alarm State after:')
 print(panel.alarm_state())
 _LOGGER.info('Disconnecting...')

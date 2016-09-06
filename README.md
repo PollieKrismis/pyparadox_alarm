@@ -15,3 +15,7 @@ In it's current form it is only able to integrate with a Paradox Alarm panel tha
 
 Later versions can be expanded to also support the IP100/150 modules. 
 
+Versioning:
+0.1.0: 
+- Gets zone and area labels and statusses and report on zone open/close status and area arm/disarm status.
+- Allows Callbacks, albeit not tested yet.
