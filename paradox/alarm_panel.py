@@ -15,13 +15,18 @@ class ParadoxAlarmPanel:
     '''This class represents an Paradox alarm panel.'''
 
     def __init__(self, paradox_model='EVO48', comm_module='PRT3',
-                 username='user', password='user',
-                 prt_port='/dev/ttyUSB0', prt_speed=57600):
+                username='user', password='user',
+                prt_port='/dev/ttyUSB0', prt_speed=57600,
+                area_cb=None, zone_cb=None):
         self._paradox_model = paradox_model
         self._username = username
         self._password = password
         self._prt_port = prt_port
         self._prt_speed = prt_speed
+
+        #Set callbacks
+        self._area_callback = area_cb
+        self._zone_callback = zone_cb
 
         #Setup default panel state
         self._panel = None
@@ -174,6 +179,12 @@ class ParadoxAlarmPanel:
         '''Sets the name of the zone.'''
         self._alarm_state['zone'][number]['name'] = name
 
+    def update_zone_status_cb(self, number, status):
+        '''Callback zone status to connected client.'''
+        #Test if someone is interested?
+        if self._zone_callback is not None:
+            self._zone_callback(number, status)
+
     def update_zone_status(self, number, status):
         '''Updates the zone status.'''
         ZONE_OPEN = 'O'
@@ -188,6 +199,8 @@ class ParadoxAlarmPanel:
                         'alarm': (ZONE_ALARM == _in_alarm),
                         'tamper': False}
         self._alarm_state['zone'][number]['status'] = _zone_info
+        #Zone status changed, who needs to know about this?
+        _ignore = self.update_zone_status_cb(number, self._alarm_state['zone'][number]['status']['open'])
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
