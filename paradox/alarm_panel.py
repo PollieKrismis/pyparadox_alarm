@@ -202,16 +202,16 @@ class ParadoxAlarmPanel:
 
     def update_zone_status(self, zone_number, zone_status):
         '''Updates the zone status.'''
-        ZONE_OPEN = 'O'
-        ZONE_ALARM = 'A'
+        #ZONE_OPEN = 'O'
+        #ZONE_ALARM = 'A'
         _status = zone_status[:1]
         _in_alarm = zone_status[1:2]
         #_fire = status[2:3]
         #_supervision_lost = status[3:4]
         #_low_battery = status[4:5]
-        _zone_info = {'open': (ZONE_OPEN == _status),
+        _zone_info = {'open': (_status == 'O'),
                         'fault': False,
-                        'alarm': (ZONE_ALARM == _in_alarm),
+                        'alarm': (_in_alarm == 'A'),
                         'tamper': False}
         self._alarm_state['zone'][zone_number]['status'] = _zone_info
         _LOGGER.debug(str.format('Zone {0} status updated.', zone_number))
