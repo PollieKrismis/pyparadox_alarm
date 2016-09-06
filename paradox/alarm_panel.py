@@ -160,38 +160,52 @@ class ParadoxAlarmPanel:
         '''Places a request on the request queue.'''
         self._to_alarm.put(request, timeout=10)
 
+    def decode_system_event(self, response):
+        '''Decodes a system event.'''
+        _event_group = response[1:4]
+        _event_number = response[4:7]
+        _area_number = response[7:10]
+        if _event_group in ['000']: #Zone closed/OK
+            self.update_zone_status(_event_number, 'C')
+        elif _event_group in ['001']: #Zone open
+            self.update_zone_status(_event_number, 'O')
+        elif _event_group in ['009', '010', '011', '012']: #Area arming
+            self.update_area_status(_area_number, 'armed')
+        else:
+            _LOGGER.debug(str.format('Event {0} to be defined.', response))
+
     def decode_response(self, response):
         '''Decode the Paradox Alarm response.'''
         _msg_type = response[:2]
-        if response[:1] == "G":
-            #System event
-            print("Event Group")
-        elif response[:2] == "ZL":
-            print("Zone Label")
+        if response[:1] == "G": #System event
+            self.decode_system_event(response)
+        elif response[:2] == "ZL": #Zone label
             self.set_zone_name(int(response[2:5]), response[5:])
-        elif _msg_type == "RZ":
-            print("Zone Status")
+        elif _msg_type == "RZ": #Zone status
             self.update_zone_status(int(response[2:5]), response[5:])
+        elif response[:2] == "AL": #Area label
+            self.set_area_name(int(response[2:5]), response[5:])
+        elif _msg_type == "AZ": #Area status
+            self.update_area_status(int(response[2:5]), response[5:])
         else:
-            print("To be defined")
+            _LOGGER.debug(str.format('Response {0} to be defined.', response))
 
-    def set_zone_name(self, number, name):
+    def set_zone_name(self, zone_number, zone_name):
         '''Sets the name of the zone.'''
-        self._alarm_state['zone'][number]['name'] = name
+        self._alarm_state['zone'][zone_number]['name'] = zone_name
 
-    def update_zone_status_cb(self, number, status):
+    def update_zone_status_cb(self, zone_number, zone_status):
         '''Callback zone status to connected client.'''
-        #Test if someone is interested?
         _LOGGER.debug(str.format('Zone callback to {}...', self._zone_callback))
         if self._zone_callback is not None:
-            self._zone_callback(number, status)
+            self._zone_callback(zone_number, zone_status)
 
-    def update_zone_status(self, number, status):
+    def update_zone_status(self, zone_number, zone_status):
         '''Updates the zone status.'''
         ZONE_OPEN = 'O'
         ZONE_ALARM = 'A'
-        _status = status[:1]
-        _in_alarm = status[1:2]
+        _status = zone_status[:1]
+        _in_alarm = zone_status[1:2]
         #_fire = status[2:3]
         #_supervision_lost = status[3:4]
         #_low_battery = status[4:5]
@@ -199,10 +213,31 @@ class ParadoxAlarmPanel:
                         'fault': False,
                         'alarm': (ZONE_ALARM == _in_alarm),
                         'tamper': False}
-        self._alarm_state['zone'][number]['status'] = _zone_info
-        _LOGGER.debug(str.format('Zone {0} status updated.', number))
+        self._alarm_state['zone'][zone_number]['status'] = _zone_info
+        _LOGGER.debug(str.format('Zone {0} status updated.', zone_number))
         #Zone status changed, who needs to know about this?
-        _ignore = self.update_zone_status_cb(number, self._alarm_state['zone'][number]['status']['open'])
+        _ignore = self.update_zone_status_cb(zone_number,
+                                    self._alarm_state['zone'][zone_number]['status']['open'])
+
+    def set_area_name(self, area_number, area_name):
+        '''Sets the name of the area/partition.'''
+        self._alarm_state['partition'][area_number]['name'] = area_name
+
+    def update_area_status_cb(self, area_number, area_status):
+        '''Callback area status to connected client.'''
+        _LOGGER.debug(str.format('Area callback to {}...', self._area_callback))
+        if self._area_callback is not None:
+            self._area_callback(area_number, area_status)
+
+    def update_area_status(self, area_number, area_status):
+        '''Updates the area status.'''
+        #_area_info = {'armed_away': (area_status == 'armed_away')}
+        #self._alarm_state.update(['partition'][area_number]['status']['armed_away'] = '')
+        self._alarm_state['partition'][area_number]['status']['armed_away'] = (area_status == 'armed_away')
+        _LOGGER.debug(str.format('Area {0} status updated.', area_number))
+        #Zone status changed, who needs to know about this?
+        _ignore = self.update_area_status_cb(area_number,
+                                    self._alarm_state['partition'][area_number]['status']['armed_away'])
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
