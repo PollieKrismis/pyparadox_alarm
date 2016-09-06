@@ -1,2 +1,1 @@
-from .alarm_panel import ParadoxAlarmPanel
-
+'''from .alarm_panel import ParadoxAlarmPanel'''
