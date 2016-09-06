@@ -182,6 +182,7 @@ class ParadoxAlarmPanel:
     def update_zone_status_cb(self, number, status):
         '''Callback zone status to connected client.'''
         #Test if someone is interested?
+        _LOGGER.debug(str.format('Zone callback to {}...', self._zone_callback))
         if self._zone_callback is not None:
             self._zone_callback(number, status)
 
@@ -199,6 +200,7 @@ class ParadoxAlarmPanel:
                         'alarm': (ZONE_ALARM == _in_alarm),
                         'tamper': False}
         self._alarm_state['zone'][number]['status'] = _zone_info
+        _LOGGER.debug(str.format('Zone {0} status updated.', number))
         #Zone status changed, who needs to know about this?
         _ignore = self.update_zone_status_cb(number, self._alarm_state['zone'][number]['status']['open'])
 
