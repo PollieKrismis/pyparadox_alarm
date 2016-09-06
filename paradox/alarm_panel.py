@@ -163,8 +163,8 @@ class ParadoxAlarmPanel:
     def decode_system_event(self, response):
         '''Decodes a system event.'''
         _event_group = response[1:4]
-        _event_number = response[4:7]
-        _area_number = response[7:10]
+        _event_number = response[5:8]
+        _area_number = response[9:12]
         if _event_group in ['000']: #Zone closed/OK
             self.update_zone_status(_event_number, 'C')
         elif _event_group in ['001']: #Zone open
