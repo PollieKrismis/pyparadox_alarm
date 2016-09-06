@@ -194,7 +194,7 @@ class ParadoxAlarmPanel:
             self.update_zone_status(int(response[2:5]), response[5:])
         elif response[:2] == "AL": #Area label
             self.set_area_name(int(response[2:5]), response[5:])
-        elif _msg_type == "AZ": #Area status
+        elif _msg_type == "RA": #Area status
             self.update_area_status(int(response[2:5]), response[5:])
         else:
             _LOGGER.debug(str.format('Response {0} to be defined.', response))
