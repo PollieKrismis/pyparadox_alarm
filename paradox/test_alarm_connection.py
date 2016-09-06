@@ -21,7 +21,7 @@ _LOGGER.info('Alarm State before:')
 #print(panel.alarm_state['zone'])
 print(panel.alarm_state())
 panel.start()
-time.sleep(40) #Wait because we're using threading
+time.sleep(60) #Wait because we're using threading
 _LOGGER.info('Alarm State after:')
 print(panel.alarm_state())
 _LOGGER.info('Disconnecting...')
