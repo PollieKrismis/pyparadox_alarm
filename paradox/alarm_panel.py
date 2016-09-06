@@ -170,7 +170,7 @@ class ParadoxAlarmPanel:
         elif _event_group in ['001']: #Zone open
             self.update_zone_status(_event_number, 'O')
         elif _event_group in ['009', '010', '011', '012']: #Area arming
-            self.update_area_status(_area_number, 'armed')
+            self.update_area_status(_area_number, 'armed_away')
         else:
             _LOGGER.debug(str.format('Event {0} to be defined.', response))
 
