@@ -132,12 +132,21 @@ class ParadoxAlarmPanel:
             self.submit_zone_label_request(i)
             time.sleep(0.1)
 
+        _LOGGER.info(str.format("Requesting {0} area labels...", area_total))
+        for i in range(1, area_total + 1):
+            self.submit_area_label_request(i)
+            time.sleep(0.1)
+
     def request_all_statuses(self, area_total, zone_total):
         '''Submits requests for all area and zone statuses.'''
         _LOGGER.info(str.format("Requesting {0} zone statuses...", zone_total))
-
         for i in range(1, zone_total + 1):
             self.submit_zone_status_request(i)
+            time.sleep(0.1)
+
+        _LOGGER.info(str.format("Requesting {0} area statuses...", area_total))
+        for i in range(1, area_total + 1):
+            self.submit_area_status_request(i)
             time.sleep(0.1)
 
     def submit_area_label_request(self, area_num):
@@ -170,7 +179,7 @@ class ParadoxAlarmPanel:
         elif _event_group in ['001']: #Zone open
             self.update_zone_status(_event_number, 'O')
         elif _event_group in ['009', '010', '011', '012']: #Area arming
-            self.update_area_status(_area_number, 'armed_away')
+            self.update_area_status(_area_number, 'A')
         else:
             _LOGGER.debug(str.format('Event {0} to be defined.', response))
 
@@ -231,9 +240,8 @@ class ParadoxAlarmPanel:
 
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
-        #_area_info = {'armed_away': (area_status == 'armed_away')}
-        #self._alarm_state.update(['partition'][area_number]['status']['armed_away'] = '')
-        self._alarm_state['partition'][area_number]['status']['armed_away'] = (area_status == 'armed_away')
+        _status = area_status[:1]
+        self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status != 'D')
         _LOGGER.debug(str.format('Area {0} status updated.', area_number))
         #Zone status changed, who needs to know about this?
         _ignore = self.update_area_status_cb(area_number,
