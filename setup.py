@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='pyparadox-alarm',
-      version='0.1.0',
+      version='0.1.1',
       description='A python3 library for running asynchronous communications with Paradox alarm control panel modules.',
       author='Paul Burger',
       author_email='PollieXmas@icloud.com',
