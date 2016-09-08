@@ -36,8 +36,10 @@ class ParadoxSerialComms:
         To do: Add a loop to attempt a connection several times before giving up.
         '''
         self._lock = Lock() #Does this do anything?
+
         try:
             self._pipe = serial.Serial(self._port, self._speed, timeout=1)
+            self._pipe.flushInput() #Gets rid of /X0 after being disconnected for long?
         except SerialException:
             if self._port is None:
                 _LOGGER.error(str.format('Port not configured yet.'))

@@ -13,3 +13,4 @@ setup(name='pyparadox',
       install_requires=['pyserial'],
       classifiers=['Development Status :: 4 - Beta', 'Programming Language :: Python :: 3.4','Programming Language :: Python :: 3.5']
   )
+

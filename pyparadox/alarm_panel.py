@@ -11,7 +11,6 @@ from alarm_state import AlarmState
 _LOGGER = logging.getLogger(__name__)
 COMMAND_ERR = "Cannot run this command while disconnected. Please run start() first."
 
-
 class ParadoxAlarmPanel:
     '''This class represents an Paradox alarm panel.'''
 

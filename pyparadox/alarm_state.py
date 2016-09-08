@@ -11,6 +11,7 @@ class AlarmState:
         _alarm_state = {'partition': {}, 'zone': {}}
 
         for i in range(1, max_partitions + 1):
+            '''Are all this needed by Home Assistant??'''
             _alarm_state['partition'][i] = {'status': {'alarm': False, 'alarm_in_memory': False,
                                                         'armed_away': False, 'ac_present': False,
                                                         'armed_bypass': False, 'chime': False,

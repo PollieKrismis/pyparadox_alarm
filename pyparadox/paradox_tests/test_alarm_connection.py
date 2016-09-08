@@ -2,7 +2,7 @@
 
 import logging
 import time
-from alarm_panel import ParadoxAlarmPanel
+from pyparadox.alarm_panel import ParadoxAlarmPanel
 #from paradox import *
 #import paradox
 
