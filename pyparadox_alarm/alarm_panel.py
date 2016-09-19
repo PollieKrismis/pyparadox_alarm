@@ -4,9 +4,9 @@ import logging
 import time
 import threading
 from queue import Queue, Empty
-from paradox_defaults import PARADOX_MODELS
-from alarm_serial_comms import ParadoxSerialComms
-from alarm_state import AlarmState
+from pyparadox_alarm.paradox_defaults import PARADOX_MODELS
+from pyparadox_alarm.alarm_serial_comms import ParadoxSerialComms
+from pyparadox_alarm.alarm_state import AlarmState
 
 _LOGGER = logging.getLogger(__name__)
 COMMAND_ERR = "Cannot run this command while disconnected. Please run start() first."
