@@ -16,8 +16,7 @@ class ParadoxAlarmPanel:
 
     def __init__(self, paradox_model='EVO48', comm_module='PRT3',
                 username='user', password='user',
-                prt_port='/dev/ttyUSB0', prt_speed=57600,
-                area_cb=None, zone_cb=None):
+                prt_port='/dev/ttyUSB0', prt_speed=57600):
         self._paradox_model = paradox_model
         self._username = username
         self._password = password
@@ -25,8 +24,8 @@ class ParadoxAlarmPanel:
         self._prt_speed = prt_speed
 
         #Set callbacks
-        self._area_callback = area_cb
-        self._zone_callback = zone_cb
+        self._callback_zone_state_change = self._defaultCallback
+        self._callback_partition_state_change = self._defaultCallback
 
         #Setup default panel state
         self._panel = None
@@ -83,19 +82,19 @@ class ParadoxAlarmPanel:
 
     @property
     def callback_zone_state_change(self):
-        return self._zoneStateChangeCallback
+        return self._callback_zone_state_change
 
     @callback_zone_state_change.setter
     def callback_zone_state_change(self, value):
-        self._zoneStateChangeCallback = value
+        self._callback_zone_state_change = value
 
     @property
     def callback_partition_state_change(self):
-        return self._partitionStateChangeCallback
+        return self._callback_partition_state_change
 
     @callback_partition_state_change.setter
     def callback_partition_state_change(self, value):
-        self._partitionStateChangeCallback = value
+        self._callback_partition_state_change = value
 
     def _defaultCallback(self, data):
         '''This is the callback that occurs when the client doesn't subscribe.'''
@@ -205,9 +204,9 @@ class ParadoxAlarmPanel:
 
     def update_zone_status_cb(self, zone_number, zone_status):
         '''Callback zone status to connected client.'''
-        _LOGGER.debug(str.format('Zone callback to {}...', self._zone_callback))
-        if self._zone_callback is not None:
-            self._zone_callback(zone_number, zone_status)
+        _LOGGER.debug(str.format('Zone callback to {}...', self._callback_zone_state_change))
+        if self._callback_zone_state_change is not None:
+            self._callback_zone_state_change(zone_number, zone_status)
 
     def update_zone_status(self, zone_number, zone_status):
         '''Updates the zone status.'''
@@ -234,9 +233,9 @@ class ParadoxAlarmPanel:
 
     def update_area_status_cb(self, area_number, area_status):
         '''Callback area status to connected client.'''
-        _LOGGER.debug(str.format('Area callback to {}...', self._area_callback))
-        if self._area_callback is not None:
-            self._area_callback(area_number, area_status)
+        _LOGGER.debug(str.format('Area callback to {}...', self._callback_partition_state_change))
+        if self._callback_partition_state_change is not None:
+            self._callback_partition_state_change(area_number, area_status)
 
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
