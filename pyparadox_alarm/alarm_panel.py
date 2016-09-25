@@ -64,11 +64,12 @@ class ParadoxAlarmPanel:
         self._zoneTimerCallback = self._defaultCallback
         '''
 
-        loggingconfig = {'level': 'DEBUG',
-            'format': '%(asctime)s %(levelname)s <%(name)s %(module)s %(funcName)s> %(message)s',
-            'datefmt': '%a, %d %b %Y %H:%M:%S'}
-
-        logging.basicConfig(**loggingconfig)
+        #Move this to the test harness if required. It is already done in Home Assistant.
+        #loggingconfig = {'level': 'DEBUG',
+        #    'format': '%(asctime)s %(levelname)s <%(name)s %(module)s %(funcName)s> %(message)s',
+        #    'datefmt': '%a, %d %b %Y %H:%M:%S'}
+        #
+        #logging.basicConfig(**loggingconfig)
 
     @ property
     def port(self):
