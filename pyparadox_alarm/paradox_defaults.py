@@ -11,7 +11,7 @@ AREA_DISARMED = 'D'
 
 PARADOX_MODELS = {
     'EVO48' :
-    {'model' : 'EVO48', 'max zones' : 21, 'max areas' : 4, 'max users' : 6, 'baudrate' : 57600},
+    {'model' : 'EVO48', 'max zones' : 48, 'max areas' : 4, 'max users' : 99, 'baudrate' : 57600},
     'EVO96' :
     {'model' : 'EVO96', 'max zones' : 96, 'max areas' : 8, 'max users' : 999, 'baudrate' : 57600},
     'EVO192' :

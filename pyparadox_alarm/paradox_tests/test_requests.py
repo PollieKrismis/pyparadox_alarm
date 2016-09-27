@@ -14,7 +14,7 @@ loggingconfig = {'level': 'DEBUG',
 
 logging.basicConfig(**loggingconfig)
 
-_LOGGER.info('Start')
+_LOGGER.info('Start test')
 panel = ParadoxAlarmPanel()
 
 _LOGGER.info('Start test:')
@@ -22,13 +22,15 @@ _LOGGER.info('Alarm State before:')
 #print(panel.alarm_state['zone'])
 print(panel.alarm_state())
 panel.start()
-time.sleep(80) #Wait because we're using threading
+while True:
+    request = input("Supply a request or type quit:")
+    if request.lower() in 'quit':
+        break
+    else:
+        panel.submit_request(request)
+
 _LOGGER.info('Alarm State after:')
 print(panel.alarm_state())
-for _ in range(3):
-    request = input("Supply a request:")
-    panel.submit_request(request)
-
 _LOGGER.info('Disconnecting...')
 panel.stop()
 _LOGGER.info('Waiting for all to stop:')

@@ -15,17 +15,20 @@ class ParadoxAlarmPanel:
     '''This class represents an Paradox alarm panel.'''
 
     def __init__(self, paradox_model='EVO48', comm_module='PRT3',
-                username='user', password='user',
+                #username='user', password='user',
                 prt_port='/dev/ttyUSB0', prt_speed=57600):
+        _LOGGER.debug('Initialising Panel')
         self._paradox_model = paradox_model
-        self._username = username
-        self._password = password
+        #self._username = username
+        #self._password = password
         self._prt_port = prt_port
         self._prt_speed = prt_speed
 
         #Set callbacks
-        self._callback_zone_state_change = self._defaultCallback
-        self._callback_partition_state_change = self._defaultCallback
+        self._callback_zone_name = self._default_callback
+        self._callback_area_name = self._default_callback
+        self._callback_zone_state_change = self._default_callback
+        self._callback_area_state_change = self._default_callback
 
         #Setup default panel state
         self._panel = None
@@ -63,13 +66,7 @@ class ParadoxAlarmPanel:
         self._cidEventCallback = self._defaultCallback
         self._zoneTimerCallback = self._defaultCallback
         '''
-
-        #Move this to the test harness if required. It is already done in Home Assistant.
-        #loggingconfig = {'level': 'DEBUG',
-        #    'format': '%(asctime)s %(levelname)s <%(name)s %(module)s %(funcName)s> %(message)s',
-        #    'datefmt': '%a, %d %b %Y %H:%M:%S'}
-        #
-        #logging.basicConfig(**loggingconfig)
+        _LOGGER.debug('Panel initialised.')
 
     @ property
     def port(self):
@@ -79,42 +76,67 @@ class ParadoxAlarmPanel:
     @property
     def paradox_model(self):
         '''Returns the model of the alarm panel being connected to.'''
+        _LOGGER.debug('Returning model name, %s.', self._paradox_model)
         return self._paradox_model
 
     @property
+    def callback_zone_name(self):
+        '''Calls function subscribed to zone name.'''
+        return self._callback_zone_name
+
+    @callback_zone_name.setter
+    def callback_zone_name(self, value):
+        '''Subscribes a function to zone name.'''
+        self._callback_zone_name = value
+
+    @property
+    def callback_area_name(self):
+        '''Calls function subscribed to area name.'''
+        return self._callback_area_name
+
+    @callback_area_name.setter
+    def callback_area_name(self, value):
+        '''Subscribes a function to area name.'''
+        self._callback_area_name = value
+
+    @property
     def callback_zone_state_change(self):
+        '''Calls function subscribed to zone changes.'''
         return self._callback_zone_state_change
 
     @callback_zone_state_change.setter
     def callback_zone_state_change(self, value):
+        '''Subscribes a function to zone changes.'''
         self._callback_zone_state_change = value
 
     @property
-    def callback_partition_state_change(self):
-        return self._callback_partition_state_change
+    def callback_area_state_change(self):
+        '''Calls function subscribed to in area/partition status changes.'''
+        return self._callback_area_state_change
 
-    @callback_partition_state_change.setter
-    def callback_partition_state_change(self, value):
-        self._callback_partition_state_change = value
+    @callback_area_state_change.setter
+    def callback_area_state_change(self, value):
+        '''Subscribes a function to area/partition status changes.'''
+        self._callback_area_state_change = value
 
-    def _defaultCallback(self, data):
+    def _default_callback(self, data):
         '''This is the callback that occurs when the client doesn't subscribe.'''
         _LOGGER.debug("Callback has not been set by client.")
 
     def start(self):
         '''Connect to the Paradox Alarm and start listening for events to occur.'''
-        _LOGGER.info(str.format("Connecting to Paradox on host: {0}, port: {1}",
-                                self._prt_port, self._prt_speed))
+        _LOGGER.info("Connecting to Paradox on host: %s, port: %d",
+                                self._prt_port, self._prt_speed)
         self._panel = ParadoxSerialComms(self._to_alarm, self._from_alarm,
                                         self._prt_port, self._prt_speed)
         self._panel.start()
         #Allow for a list of areas and zones to be passed rather than simply requesting all
-        self.request_all_labels(self._max_areas, self._max_zones)
+        #self.request_all_labels(self._max_areas, self._max_zones)
         listen_thread = threading.Thread(target=self.monitor_response_queue)
         listen_thread.start() #We need a thread to keep on listening for alarm messages
-        time.sleep(2) #With proper queue management this should not be needed.
-        self._to_alarm.join() #Allow some time for all the requests to be serviced
-        self.request_all_statuses(self._max_areas, self._max_zones)
+        #time.sleep(2) #With proper queue management this should not be needed.
+        #self._to_alarm.join() #Allow some time for all the requests to be serviced
+        #self.request_all_statuses(self._max_areas, self._max_zones)
 
     def stop(self):
         '''Shut down and close our connection to the Paradox Alarm.'''
@@ -127,7 +149,7 @@ class ParadoxAlarmPanel:
 
     def request_all_labels(self, area_total, zone_total):
         '''Submits requests for all area and zone labels.'''
-        _LOGGER.info(str.format("Requesting {0} zone labels...", zone_total))
+        _LOGGER.debug("Requesting %s zone labels...", zone_total)
         for i in range(1, zone_total + 1):
             self.submit_zone_label_request(i)
             time.sleep(0.1)
@@ -189,19 +211,27 @@ class ParadoxAlarmPanel:
         if response[:1] == "G": #System event
             self.decode_system_event(response)
         elif response[:2] == "ZL": #Zone label
-            self.set_zone_name(int(response[2:5]), response[5:])
+            self.update_zone_name(int(response[2:5]), response[5:])
         elif _msg_type == "RZ": #Zone status
             self.update_zone_status(int(response[2:5]), response[5:])
         elif response[:2] == "AL": #Area label
-            self.set_area_name(int(response[2:5]), response[5:])
+            self.update_area_name(int(response[2:5]), response[5:])
         elif _msg_type == "RA": #Area status
             self.update_area_status(int(response[2:5]), response[5:])
         else:
             _LOGGER.debug(str.format('Response {0} to be defined.', response))
 
-    def set_zone_name(self, zone_number, zone_name):
+    def update_zone_name_cb(self, zone_number, zone_name):
+        '''Callback zone name to connected client.'''
+        _LOGGER.debug(str.format('Zone callback to {}...', self._callback_zone_name))
+        if self._callback_zone_name is not None:
+            self._callback_zone_name(zone_number, zone_name)
+
+    def update_zone_name(self, zone_number, zone_name):
         '''Sets the name of the zone.'''
         self._alarm_state['zone'][zone_number]['name'] = zone_name
+        _ignore = self.update_zone_name_cb(zone_number,
+                                    self._alarm_state['zone'][zone_number]['name'])
 
     def update_zone_status_cb(self, zone_number, zone_status):
         '''Callback zone status to connected client.'''
@@ -228,15 +258,23 @@ class ParadoxAlarmPanel:
         _ignore = self.update_zone_status_cb(zone_number,
                                     self._alarm_state['zone'][zone_number]['status']['open'])
 
-    def set_area_name(self, area_number, area_name):
+    def update_area_name_cb(self, area_number, area_name):
+        '''Callback area name to connected client.'''
+        _LOGGER.debug(str.format('Area name callback to {}...', self._callback_area_name))
+        if self._callback_area_name is not None:
+            self._callback_area_name(area_number, area_name)
+
+    def update_area_name(self, area_number, area_name):
         '''Sets the name of the area/partition.'''
         self._alarm_state['partition'][area_number]['name'] = area_name
+        _ignore = self.update_area_name_cb(area_number,
+                            self._alarm_state['partition'][area_number]['name'])
 
     def update_area_status_cb(self, area_number, area_status):
         '''Callback area status to connected client.'''
-        _LOGGER.debug(str.format('Area callback to {}...', self._callback_partition_state_change))
-        if self._callback_partition_state_change is not None:
-            self._callback_partition_state_change(area_number, area_status)
+        _LOGGER.debug(str.format('Area status callback to {}...', self._callback_area_state_change))
+        if self._callback_area_state_change is not None:
+            self._callback_area_state_change(area_number, area_status)
 
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
@@ -245,7 +283,7 @@ class ParadoxAlarmPanel:
         _LOGGER.debug(str.format('Area {0} status updated.', area_number))
         #Zone status changed, who needs to know about this?
         _ignore = self.update_area_status_cb(area_number,
-                                    self._alarm_state['partition'][area_number]['status']['armed_away'])
+                            self._alarm_state['partition'][area_number]['status']['armed_away'])
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
