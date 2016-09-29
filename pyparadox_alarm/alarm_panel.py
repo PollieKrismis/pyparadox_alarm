@@ -80,6 +80,11 @@ class ParadoxAlarmPanel:
         return self._paradox_model
 
     @property
+    def alarm_state(self):
+        '''Returns the alarm state dictionary.'''
+        return self._alarm_state
+
+    @property
     def callback_zone_name(self):
         '''Calls function subscribed to zone name.'''
         return self._callback_zone_name
@@ -119,7 +124,7 @@ class ParadoxAlarmPanel:
         '''Subscribes a function to area/partition status changes.'''
         self._callback_area_state_change = value
 
-    def _default_callback(self, data):
+    def _default_callback(self, number, data):
         '''This is the callback that occurs when the client doesn't subscribe.'''
         _LOGGER.debug("Callback has not been set by client.")
 
@@ -300,7 +305,3 @@ class ParadoxAlarmPanel:
                 time.sleep(5)
 
         _LOGGER.debug(str.format('Stop monitoring response/event queue...'))
-
-    def alarm_state(self):
-        '''Returns the alarm state dictionary.'''
-        return self._alarm_state
