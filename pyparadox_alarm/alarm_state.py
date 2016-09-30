@@ -12,7 +12,7 @@ class AlarmState:
 
         for i in range(1, max_partitions + 1):
             #Are all these dictionary items needed by Home Assistant?
-            _default_area_label = 'Area ' + i + ' label default'
+            _default_area_label = 'Area ' + str(i) + ' label default'
             _alarm_state['partition'][i] = {'status': {'alarm': False, 'alarm_in_memory': False,
                                                         'armed_away': False, 'ac_present': False,
                                                         'armed_bypass': False, 'chime': False,
@@ -24,7 +24,7 @@ class AlarmState:
                                                         'exit_delay': False, 'entry_delay': False,},
                                             'name': _default_area_label}
         for j in range(1, max_zones + 1):
-            _default_zone_label = 'Zone ' + j + ' label default'
+            _default_zone_label = 'Zone ' + str(j) + ' label default'
             _alarm_state['zone'][j] = {'status': {'open': False, 'fault': False, 'alarm': False,
                                                     'tamper': False},
                                        'last_fault': 0,
