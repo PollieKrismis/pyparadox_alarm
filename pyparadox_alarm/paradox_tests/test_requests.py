@@ -20,7 +20,7 @@ panel = ParadoxAlarmPanel()
 _LOGGER.info('Start test:')
 _LOGGER.info('Alarm State before:')
 #print(panel.alarm_state['zone'])
-print(panel.alarm_state())
+print(panel.alarm_state)
 panel.start()
 while True:
     request = input("Supply a request or type quit:")
@@ -30,7 +30,7 @@ while True:
         panel.submit_request(request)
 
 _LOGGER.info('Alarm State after:')
-print(panel.alarm_state())
+print(panel.alarm_state)
 _LOGGER.info('Disconnecting...')
 panel.stop()
 _LOGGER.info('Waiting for all to stop:')
