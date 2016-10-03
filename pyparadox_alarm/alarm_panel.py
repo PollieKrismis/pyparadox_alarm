@@ -276,11 +276,11 @@ class ParadoxAlarmPanel:
         _ignore = self.update_area_name_cb(area_number,
                             self._alarm_state['partition'][area_number]['name'])
 
-    def update_area_status_cb(self, area_number, area_status):
+    def update_area_status_cb(self, area_number):
         '''Callback area status to connected client.'''
-        _LOGGER.debug(str.format('Area status callback to {}...', self._callback_area_state_change))
+        _LOGGER.debug(str.format('Area status callback to %s...', self._callback_area_state_change))
         if self._callback_area_state_change is not None:
-            self._callback_area_state_change(area_number, area_status)
+            self._callback_area_state_change(area_number)
 
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
