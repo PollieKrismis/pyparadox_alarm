@@ -229,6 +229,8 @@ class ParadoxAlarmPanel:
             self.update_zone_status(_event_number, 'O')
         elif _event_group in ['009', '010', '011', '012']: #Area arming
             self.update_area_status(_area_number, 'A')
+        elif _event_group in ['014']: #Area disarming
+            self.update_area_status(_area_number, 'D')
         else:
             _LOGGER.debug(str.format('Event {0} to be defined.', response))
 
@@ -316,13 +318,13 @@ class ParadoxAlarmPanel:
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
         _status = area_status[:1]
-        if _status in 'A':
+        if _status in ['A']:
             self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status == 'A')
             _ignore = self.update_area_armed_cb(area_number)
-        elif _status in 'S':
+        elif _status in ['S']:
             self._alarm_state['partition'][area_number]['status']['armed_stay'] = (_status == 'S')
             _ignore = self.update_area_stay_armed_cb(area_number)
-        elif _status in 'D':
+        elif _status in ['D']:
             self._alarm_state['partition'][area_number]['status']['alpha'] = (_status == 'D')
             _ignore = self.update_area_disarmed_cb(area_number)
         _LOGGER.debug('Area %d status updated.', area_number)
