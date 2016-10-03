@@ -212,6 +212,7 @@ class ParadoxAlarmPanel:
 
     def decode_response(self, response):
         '''Decode the Paradox Alarm response.'''
+        #2Do: Handle requests that failed, i.e. &fail
         _msg_type = response[:2]
         if response[:1] == "G": #System event
             self.decode_system_event(response)
@@ -284,11 +285,14 @@ class ParadoxAlarmPanel:
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
         _status = area_status[:1]
-        self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status != 'D')
-        _LOGGER.debug(str.format('Area {0} status updated.', area_number))
-        #Zone status changed, who needs to know about this?
-        _ignore = self.update_area_status_cb(area_number,
-                            self._alarm_state['partition'][area_number]['status']['armed_away'])
+        self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status == 'A')
+        self._alarm_state['partition'][area_number]['status']['armed_stay'] = (_status == 'S')
+        self._alarm_state['partition'][area_number]['status']['alpha'] = (_status == 'D')
+        _LOGGER.debug('Area %d status updated.', area_number)
+
+        #Area status changed, who needs to know about this?
+        _ignore = self.update_area_status_cb(area_number)
+        #Sends area number that changed only. Called function will reference alarm state directly.
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
@@ -297,8 +301,8 @@ class ParadoxAlarmPanel:
         while not self._shutdown:
             try:
                 response = self._from_alarm.get_nowait()
-                self.decode_response(response)
                 _LOGGER.debug(str.format('Response found:{0}', response))
+                self.decode_response(response)
                 self._from_alarm.task_done()
                 time.sleep(0.1)
             except Empty:
