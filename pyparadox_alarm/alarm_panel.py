@@ -28,7 +28,9 @@ class ParadoxAlarmPanel:
         self._callback_zone_name = self._default_callback
         self._callback_area_name = self._default_callback
         self._callback_zone_state_change = self._default_callback
-        self._callback_area_state_change = self._default_callback
+        self._callback_area_armed = self._default_callback
+        self._callback_area_stay_armed = self._default_callback
+        self._callback_area_disarmed = self._default_callback
 
         #Setup default panel state
         self._panel = None
@@ -115,18 +117,38 @@ class ParadoxAlarmPanel:
         self._callback_zone_state_change = value
 
     @property
-    def callback_area_state_change(self):
-        '''Calls function subscribed to in area/partition status changes.'''
-        return self._callback_area_state_change
+    def callback_area_armed(self):
+        '''Calls function subscribed to an area/partition arming event.'''
+        return self._callback_area_armed
 
-    @callback_area_state_change.setter
-    def callback_area_state_change(self, value):
-        '''Subscribes a function to area/partition status changes.'''
-        self._callback_area_state_change = value
+    @callback_area_armed.setter
+    def callback_area_armed(self, value):
+        '''Subscribes a function to an area/partition arming event.'''
+        self._callback_area_armed = value
+
+    @property
+    def callback_area_stay_armed(self):
+        '''Calls function subscribed to an area/partition stay armed event.'''
+        return self._callback_area_stay_armed
+
+    @callback_area_stay_armed.setter
+    def callback_area_stay_armed(self, value):
+        '''Subscribes a function to an area/partition stay armed event.'''
+        self._callback_area_stay_armed = value
+
+    @property
+    def callback_area_disarmed(self):
+        '''Calls function subscribed to an area/partition disarming event.'''
+        return self._callback_area_disarmed
+
+    @callback_area_disarmed.setter
+    def callback_area_disarmed(self, value):
+        '''Subscribes a function to an area/partition disarming event.'''
+        self._callback_area_disarmed = value
 
     def _default_callback(self, number):
         '''This is the callback that occurs when the client doesn't subscribe.'''
-        _LOGGER.debug("Callback has not been set by client.")
+        _LOGGER.debug("Callback for area/zone/user %s has not been set by client.", number)
 
     def start(self):
         '''Connect to the Paradox Alarm and start listening for events to occur.'''
@@ -273,23 +295,37 @@ class ParadoxAlarmPanel:
         self._alarm_state['partition'][area_number]['name'] = area_name
         _ignore = self.update_area_name_cb(area_number)
 
-    def update_area_status_cb(self, area_number):
-        '''Callback area status to connected client.'''
-        _LOGGER.debug(str.format('Area status callback to %s...', self._callback_area_state_change))
-        if self._callback_area_state_change is not None:
-            self._callback_area_state_change(area_number)
+    def update_area_armed_cb(self, area_number):
+        '''Callback area armed to connected client.'''
+        _LOGGER.debug('Area status callback to %s...', self._callback_area_armed)
+        if self._callback_area_armed is not None:
+            self._callback_area_armed(area_number)
+
+    def update_area_stay_armed_cb(self, area_number):
+        '''Callback area stay armed to connected client.'''
+        _LOGGER.debug('Area status callback to %s...', self._callback_area_stay_armed)
+        if self._callback_area_stay_armed is not None:
+            self._callback_area_stay_armed(area_number)
+
+    def update_area_disarmed_cb(self, area_number):
+        '''Callback area disarmed to connected client.'''
+        _LOGGER.debug('Area status callback to %s...', self._callback_area_disarmed)
+        if self._callback_area_disarmed is not None:
+            self._callback_area_disarmed(area_number)
 
     def update_area_status(self, area_number, area_status):
         '''Updates the area status.'''
         _status = area_status[:1]
-        self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status == 'A')
-        self._alarm_state['partition'][area_number]['status']['armed_stay'] = (_status == 'S')
-        self._alarm_state['partition'][area_number]['status']['alpha'] = (_status == 'D')
+        if _status in 'A':
+            self._alarm_state['partition'][area_number]['status']['armed_away'] = (_status == 'A')
+            _ignore = self.update_area_armed_cb(area_number)
+        elif _status in 'S':
+            self._alarm_state['partition'][area_number]['status']['armed_stay'] = (_status == 'S')
+            _ignore = self.update_area_stay_armed_cb(area_number)
+        elif _status in 'D':
+            self._alarm_state['partition'][area_number]['status']['alpha'] = (_status == 'D')
+            _ignore = self.update_area_disarmed_cb(area_number)
         _LOGGER.debug('Area %d status updated.', area_number)
-
-        #Area status changed, who needs to know about this?
-        _ignore = self.update_area_status_cb(area_number)
-        #Sends area number that changed only. Called function will reference alarm state directly.
 
     def monitor_response_queue(self):
         '''Wait for responses from the Paradox Alarm and decode them (as thread).'''
