@@ -124,7 +124,7 @@ class ParadoxAlarmPanel:
         '''Subscribes a function to area/partition status changes.'''
         self._callback_area_state_change = value
 
-    def _default_callback(self, number, data):
+    def _default_callback(self, number):
         '''This is the callback that occurs when the client doesn't subscribe.'''
         _LOGGER.debug("Callback has not been set by client.")
 
@@ -227,23 +227,22 @@ class ParadoxAlarmPanel:
         else:
             _LOGGER.debug(str.format('Response {0} to be defined.', response))
 
-    def update_zone_name_cb(self, zone_number, zone_name):
+    def update_zone_name_cb(self, zone_number):
         '''Callback zone name to connected client.'''
         _LOGGER.debug(str.format('Zone callback to {}...', self._callback_zone_name))
         if self._callback_zone_name is not None:
-            self._callback_zone_name(zone_number, zone_name)
+            self._callback_zone_name(zone_number)
 
     def update_zone_name(self, zone_number, zone_name):
         '''Sets the name of the zone.'''
         self._alarm_state['zone'][zone_number]['name'] = zone_name
-        _ignore = self.update_zone_name_cb(zone_number,
-                                    self._alarm_state['zone'][zone_number]['name'])
+        _ignore = self.update_zone_name_cb(zone_number)
 
-    def update_zone_status_cb(self, zone_number, zone_status):
+    def update_zone_status_cb(self, zone_number):
         '''Callback zone status to connected client.'''
         _LOGGER.debug(str.format('Zone callback to {}...', self._callback_zone_state_change))
         if self._callback_zone_state_change is not None:
-            self._callback_zone_state_change(zone_number, zone_status)
+            self._callback_zone_state_change(zone_number)
 
     def update_zone_status(self, zone_number, zone_status):
         '''Updates the zone status.'''
@@ -261,20 +260,18 @@ class ParadoxAlarmPanel:
         self._alarm_state['zone'][zone_number]['status'] = _zone_info
         _LOGGER.debug(str.format('Zone {0} status updated.', zone_number))
         #Zone status changed, who needs to know about this?
-        _ignore = self.update_zone_status_cb(zone_number,
-                                    self._alarm_state['zone'][zone_number]['status']['open'])
+        _ignore = self.update_zone_status_cb(zone_number)
 
-    def update_area_name_cb(self, area_number, area_name):
+    def update_area_name_cb(self, area_number):
         '''Callback area name to connected client.'''
         _LOGGER.debug(str.format('Area name callback to {}...', self._callback_area_name))
         if self._callback_area_name is not None:
-            self._callback_area_name(area_number, area_name)
+            self._callback_area_name(area_number)
 
     def update_area_name(self, area_number, area_name):
         '''Sets the name of the area/partition.'''
         self._alarm_state['partition'][area_number]['name'] = area_name
-        _ignore = self.update_area_name_cb(area_number,
-                            self._alarm_state['partition'][area_number]['name'])
+        _ignore = self.update_area_name_cb(area_number)
 
     def update_area_status_cb(self, area_number):
         '''Callback area status to connected client.'''
