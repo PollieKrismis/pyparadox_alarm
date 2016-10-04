@@ -1,10 +1,8 @@
-'''Some code to help test Paradox alarm interface.'''
+'''Some code to help test Paradox alarm interface by manually supplying commands.'''
 
 import logging
 import time
 from pyparadox_alarm.alarm_panel import ParadoxAlarmPanel
-#from paradox import *
-#import paradox
 
 _LOGGER = logging.getLogger(__name__)
 

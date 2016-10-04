@@ -9,6 +9,7 @@ ZONE_OPEN = 'O'
 ZONE_ALARM = 'A'
 AREA_DISARMED = 'D'
 
+#Default values to be used if none are specified or for auto discovery.
 PARADOX_MODELS = {
     'EVO48' :
     {'model' : 'EVO48', 'max zones' : 48, 'max areas' : 4, 'max users' : 99, 'baudrate' : 57600},

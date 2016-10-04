@@ -3,8 +3,6 @@
 import logging
 import time
 from pyparadox_alarm.alarm_panel import ParadoxAlarmPanel
-#from paradox import *
-#import paradox
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,17 +12,21 @@ loggingconfig = {'level': 'DEBUG',
 
 logging.basicConfig(**loggingconfig)
 
+TEST_TOT_AREA = 1
+TEST_TOT_ZONE = 6
+TEST_TOT_WAIT = TEST_TOT_ZONE * 3
 _LOGGER.warn('Start')
 panel = ParadoxAlarmPanel()
 
 _LOGGER.info('Start test:')
 _LOGGER.info('Alarm State before:')
 #print(panel.alarm_state['zone'])
-print(panel.alarm_state())
+print(panel.alarm_state)
 panel.start()
-time.sleep(80) #Wait because we're using threading
+panel.request_all_labels(TEST_TOT_AREA, TEST_TOT_ZONE)
+time.sleep(TEST_TOT_WAIT) #Wait because we're using threading
 _LOGGER.info('Alarm State after:')
-print(panel.alarm_state())
+print(panel.alarm_state)
 _LOGGER.info('Disconnecting...')
 panel.stop()
 _LOGGER.info('Waiting for all to stop:')

@@ -1,2 +1,1 @@
-'''Supposed to leave this empty?'''
-'''from .alarm_panel import ParadoxAlarmPanel'''
+'''Empty __init__.py required by Python to scan (for packages?)'''

@@ -1,4 +1,4 @@
-'''Replicates a Paradox Alarm panel and allows interfacing to it.'''
+'''Replicates a Paradox Alarm panel as a dictionary and allows interfacing to it.'''
 
 import logging
 import time

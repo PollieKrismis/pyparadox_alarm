@@ -1,4 +1,6 @@
 '''
+Handles the (usb) serial communication to/from the Paradox alarm panel.
+
 Created on 10 Aug 2016
 
 @author: Paul Burger
